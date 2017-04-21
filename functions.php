@@ -1,10 +1,166 @@
 <?php
 /**
- * Functions and definitions.
+ * Thea House functions and definitions.
  *
- * @package theahouse
+ * @link https://developer.wordpress.org/themes/basics/theme-functions/
+ *
+ * @package Thea House
  */
 
-add_action( 'init', function() {
-	add_post_type_support( 'sc_event', 'archive' );
-} );
+if ( ! function_exists( 'th_doc_setup' ) ) :
+	/**
+	 * Sets up theme defaults and registers support for various WordPress features.
+	 *
+	 * Note that this function is hooked into the after_setup_theme hook, which
+	 * runs before the init hook. The init hook is too late for some features, such
+	 * as indicating support for post thumbnails.
+	 */
+	function th_doc_setup() {
+		/**
+		 * Make theme available for translation.
+		 * Translations can be filed in the /languages/ directory.
+		 * If you're building a theme based on Thea House, use a find and replace
+		 * to change 'thea-house' to the name of your theme in all the template files.
+		 * You will also need to update the Gulpfile with the new text domain
+		 * and matching destination POT file.
+		 */
+		load_theme_textdomain( 'thea-house', get_template_directory() . '/languages' );
+
+		// Add default posts and comments RSS feed links to head.
+		add_theme_support( 'automatic-feed-links' );
+
+		/**
+		 * Let WordPress manage the document title.
+		 * By adding theme support, we declare that this theme does not use a
+		 * hard-coded <title> tag in the document head, and expect WordPress to
+		 * provide it for us.
+		 */
+		add_theme_support( 'title-tag' );
+
+		/**
+		 * Enable support for Post Thumbnails on posts and pages.
+		 *
+		 * @link https://developer.wordpress.org/themes/functionality/featured-images-post-thumbnails/
+		 */
+		add_theme_support( 'post-thumbnails' );
+
+		// This theme uses wp_nav_menu() in one location.
+		register_nav_menus( array(
+			'primary' => esc_html__( 'Primary Menu', 'thea-house' ),
+			'mobile'  => esc_html__( 'Optional Mobile Menu', 'thea-house' ),
+		) );
+
+		/**
+		 * Switch default core markup for search form, comment form, and comments
+		 * to output valid HTML5.
+		 */
+		add_theme_support( 'html5', array(
+			'search-form',
+			'comment-form',
+			'comment-list',
+			'gallery',
+			'caption',
+		) );
+
+		// Set up the WordPress core custom background feature.
+		add_theme_support( 'custom-background', apply_filters( 'th_doc_custom_background_args', array(
+			'default-color' => 'ffffff',
+			'default-image' => '',
+		) ) );
+
+		// Custom logo support.
+		add_theme_support( 'custom-logo', array(
+			'height'      => 250,
+			'width'       => 500,
+			'flex-height' => true,
+			'flex-width'  => true,
+			'header-text' => array( 'site-title', 'site-description' ),
+		) );
+
+		// Add theme support for selective refresh for widgets.
+		add_theme_support( 'customize-selective-refresh-widgets' );
+	}
+endif; // th_doc_setup
+add_action( 'after_setup_theme', 'th_doc_setup' );
+
+/**
+ * Set the content width in pixels, based on the theme's design and stylesheet.
+ *
+ * Priority 0 to make it available to lower priority callbacks.
+ *
+ * @global int $content_width
+ */
+function th_doc_content_width() {
+	$GLOBALS['content_width'] = apply_filters( 'th_doc_content_width', 640 );
+}
+add_action( 'after_setup_theme', 'th_doc_content_width', 0 );
+
+/**
+ * Register widget area.
+ *
+ * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
+ */
+function th_doc_widgets_init() {
+
+	// Define sidebars.
+	$sidebars = array(
+		'sidebar-1'  => esc_html__( 'Sidebar 1', 'thea-house' ),
+		// 'sidebar-2'  => esc_html__( 'Sidebar 2', 'thea-house' ),
+		// 'sidebar-3'  => esc_html__( 'Sidebar 3', 'thea-house' ),
+	);
+
+	// Loop through each sidebar and register.
+	foreach ( $sidebars as $sidebar_id => $sidebar_name ) {
+		register_sidebar( array(
+			'name'          => $sidebar_name,
+			'id'            => $sidebar_id,
+			'description'   => /* translators: the sidebar name */ sprintf( esc_html__( 'Widget area for %s', 'thea-house' ), $sidebar_name ),
+			'before_widget' => '<aside class="widget %2$s">',
+			'after_widget'  => '</aside>',
+			'before_title'  => '<h3 class="widget-title">',
+			'after_title'   => '</h3>',
+		) );
+	}
+
+}
+add_action( 'widgets_init', 'th_doc_widgets_init' );
+
+/**
+ * Custom template tags for this theme.
+ */
+require get_template_directory() . '/inc/template-tags.php';
+
+/**
+ * Custom functions that act independently of the theme templates.
+ */
+require get_template_directory() . '/inc/extras.php';
+
+/**
+ * Load Jetpack compatibility file.
+ */
+require get_template_directory() . '/inc/jetpack.php';
+
+/**
+ * Load styles and scripts.
+ */
+require get_template_directory() . '/inc/scripts.php';
+
+/**
+ * Load custom ACF features.
+ */
+require get_template_directory() . '/inc/acf.php';
+
+/**
+ * Load custom filters and hooks.
+ */
+require get_template_directory() . '/inc/hooks.php';
+
+/**
+ * Load custom queries.
+ */
+require get_template_directory() . '/inc/queries.php';
+
+/**
+ * Customizer additions.
+ */
+require get_template_directory() . '/inc/customizer/customizer.php';
